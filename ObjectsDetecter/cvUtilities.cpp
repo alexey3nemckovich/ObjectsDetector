@@ -352,7 +352,10 @@ namespace cvutils
         vector<cv::Vec3b> colors;
         for (int i = 0; i < objectsInfo.size(); i++)
         {
-            objectsInfo[i].image = Mat(image, objectsInfo[i].sourceImageRect);
+            cv::Rect& r = objectsInfo[i].sourceImageRect;
+
+            objectsInfo[i].image.create(r.width, r.height, image.type());
+            image(r).copyTo(objectsInfo[i].image);
             colors.push_back(GetRandomColor());
         }
 
