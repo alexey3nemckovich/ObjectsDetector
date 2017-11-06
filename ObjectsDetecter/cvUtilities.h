@@ -42,6 +42,7 @@ namespace cvutils
 
     typedef vector<ObjectInfo> ObjectsList;
     typedef vector<ObjectsList::iterator> PobjectsList;
+    typedef map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> ObjectsGroupsMap;
 
     void SaveObjectImages(const ObjectsList& objects);
 
@@ -52,6 +53,7 @@ namespace cvutils
         Mat typesImage;
         Mat objectsImage;
         ObjectsList detectedObjects;
+        ObjectsGroupsMap detectedObjectsGroupsMap;
     };
 
     ImageProcessResult ProcessImage(const cv::Mat& img);

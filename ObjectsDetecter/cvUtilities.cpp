@@ -146,13 +146,13 @@ namespace cvutils
 
     ImageProcessResult::ImageProcessResult(const cv::Mat& mat)
     {
-        mat.copyTo(typesImage);
+        mat.copyTo(groupsImage);
         mat.copyTo(objectsImage);
     }
 
     ObjectsList SegmentObjects(const Mat& sourceImage, bool useLaplacianSharpening);
 
-    map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> FindTemplatesObjects(const ObjectsList& objects);
+    ObjectsGroupsMap FindObjectsGroups(const ObjectsList& objects);
 
     ImageProcessResult ProcessImage(const cv::Mat& img)
     {
@@ -162,6 +162,16 @@ namespace cvutils
         for (int i = 0; i < res.detectedObjects.size(); i++)
         {
             rectangle(res.objectsImage, res.detectedObjects[i].sourceImageRect, GetRandomColor(), 3);
+        }
+
+        res.detectedObjectsGroupsMap = FindObjectsGroups(res.detectedObjects);
+        for (auto it = res.detectedObjectsGroupsMap.begin(); res.detectedObjectsGroupsMap.end() != it; it++)
+        {
+            auto groupColor = GetRandomColor();
+            for (int i = 0; i < it->second.size(); it++)
+            {
+                rectangle(res.groupsImage, it->second[i]->sourceImageRect, groupColor, 3);
+            }
         }
 
         return res;
@@ -386,101 +396,74 @@ namespace cvutils
         return objectsInfo;
     }
 
-    map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> FindTemplatesObjects(const ObjectsList& objects)
+    map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> FindObjectsGroups(const ObjectsList& objects)
     {
-        map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> objectsTypesLists;
-        vector<ObjectsList::const_iterator> notTypedObjects;
-
-        for (auto pCurrentObj = objects.begin(); objects.end() != pCurrentObj; pCurrentObj++)
+        map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> maxValResultsMap;
+        for (auto objIt = objects.begin(); objects.end() != objIt; objIt++)
         {
-            notTypedObjects.push_back(pCurrentObj);
-        }
+            const Mat& img = objIt->image;
 
-        for (auto pTemplateObj = objects.begin(); notTypedObjects.size() != 0 && objects.end() != pTemplateObj; pTemplateObj++)
-        {
-            int i = 0;
-
-            while (notTypedObjects.size() > 0 && i < notTypedObjects.size())
+            for (auto templateIt = objects.begin(); objects.end() != templateIt; templateIt++)
             {
-                auto pCurrentObj = notTypedObjects[i];
-
-                Mat objImage(pCurrentObj->image);
-
-                //Resize if needed
-                if (objImage.rows < pTemplateObj->image.rows)
+                if (templateIt == objIt)
                 {
-                    double f = (double)pTemplateObj->image.rows / objImage.rows;
-                    resize(objImage, objImage, Size(), f, f);
+                    continue;
                 }
 
-                if (objImage.cols < pTemplateObj->image.cols)
-                {
-                    double f = (double)pTemplateObj->image.cols / objImage.cols;
-                    resize(objImage, objImage, Size(), f, f);
-                }
+                const Mat& templ = templateIt->image;
 
-                //
                 Mat result;
                 double minVal, maxVal;
                 Point minLoc, maxLoc;
 
-                matchTemplate(objImage, pTemplateObj->image, result, TM_CCOEFF_NORMED);
-                minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
-
-                if (maxVal > 0.75)
+                if (img.rows < templ.rows ||
+                    img.cols < templ.cols)
                 {
-                    objectsTypesLists[pTemplateObj].push_back(
-                        pCurrentObj
-                    );
-                    notTypedObjects.erase(notTypedObjects.begin() + i);
+                    int vertBorder = 0;
+                    int horzBorder = 0;
+
+                    Mat sizedImage;
+                    img.copyTo(sizedImage);
+
+                    if (sizedImage.rows < templ.rows)
+                    {
+                        ResizeImageToRowsCount(templ.rows, sizedImage);
+                    }
+
+                    if (sizedImage.cols < templ.cols)
+                    {
+                        ResizeImageToColsCount(templ.cols, sizedImage);
+                    }
+
+                    int result_cols = sizedImage.cols - templ.cols + 1;
+                    int result_rows = sizedImage.rows - templ.rows + 1;
+
+                    result.create(result_rows, result_cols, CV_32FC1);
+                    matchTemplate(sizedImage, templ, result, TM_CCOEFF_NORMED);
                 }
                 else
                 {
-                    i++;
+                    int result_cols = img.cols - templ.cols + 1;
+                    int result_rows = img.rows - templ.rows + 1;
+
+                    result.create(result_rows, result_cols, CV_32FC1);
+                    matchTemplate(img, templ, result, TM_CCOEFF_NORMED);
+                }
+
+                //normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
+                minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
+
+                if (maxVal > maxValResultsMap[objIt].second)
+                {
+                    maxValResultsMap[objIt].first = templateIt;
+                    maxValResultsMap[objIt].second = maxVal;
                 }
             }
         }
 
-        return objectsTypesLists;
-    }
+        map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> objectsTypesLists;
 
-    map<ObjectsList::const_iterator, ObjectsList> FindTemplatesObjects(const ObjectsList& objects, const Mat& image)
-    {
-        Mat imageCopy;
-        image.copyTo(imageCopy);
-        int countTypedObjects = 0;
-        map<ObjectsList::const_iterator, ObjectsList> objectsTypesLists;
 
-        for (auto pTemplateObj = objects.begin(); objects.end() != pTemplateObj; pTemplateObj++)
-        {
-            Mat result;
-            double minVal, maxVal;
-            Point minLoc, maxLoc;
-
-            bool stopSearch = false;
-            while (!stopSearch)
-            {
-                matchTemplate(imageCopy, pTemplateObj->image, result, TM_CCOEFF_NORMED);
-                minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
-
-                if (maxVal > 0.8)
-                {
-                    ObjectInfo objInfo;
-                    objInfo.sourceImageRect = Rect(
-                        maxLoc,
-                        Point(maxLoc.x + pTemplateObj->image.cols, maxLoc.y + pTemplateObj->image.rows)
-                    );
-
-                    objectsTypesLists[pTemplateObj].push_back(
-                        objInfo
-                    );
-                }
-                else
-                {
-                    stopSearch = true;
-                }
-            };
-        }
 
         return objectsTypesLists;
     }
