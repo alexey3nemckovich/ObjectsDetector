@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\FromSync">
+      <UniqueIdentifier>{bd01f489-425d-4bd1-a6c9-17f2e73b01f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FromSync">
+      <UniqueIdentifier>{64dd0f07-5b8a-41d0-bc31-27909883da95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cv">
+      <UniqueIdentifier>{016ab0ee-be3c-4edd-b91f-735a550c99ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cv">
+      <UniqueIdentifier>{375b9cd5-61a2-4b22-bc1a-519ec77c073c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ObjectsDetecter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IDGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonLiterals.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonTypes.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonUtilities.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="SmartPointer.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncButton.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncImage.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncLabel.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncTypes.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowUtilities.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="cvUtilities.h">
+      <Filter>Header Files\cv</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ObjectsDetecter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonUtilities.cpp">
+      <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="IDGenerator.cpp">
+      <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncButton.cpp">
+      <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncImage.cpp">
+      <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncLabel.cpp">
+      <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowUtilities.cpp">
+      <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="cvUtilities.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ObjectsDetecter.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ObjectsDetecter.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\ObjectsDetecter.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
