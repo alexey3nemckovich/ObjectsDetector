@@ -44,6 +44,7 @@ private:
     CButton _buttonProcessImage;
     CButton _buttonShowImageObjects;
     CButton _buttonShowObjectsGroups;
+    CButton _checkBoxUseImageSharpening;
 
 private:
     Status _status;
@@ -51,6 +52,9 @@ private:
 private:
     int _cx;
     int _cy;
+
+private:
+    bool _useImageSharpening = false;
 
 private:
     cv::Mat _sourceImage;

@@ -61,6 +61,6 @@ namespace cvutils
         vector<ObjectIteratorList> detectedObjectsGroups;
     };
 
-    ImageProcessResult ProcessImage(cv::Mat& img);
+    ImageProcessResult ProcessImage(cv::Mat& img, bool useSharpening = true);
 
 }

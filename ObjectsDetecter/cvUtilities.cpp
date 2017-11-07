@@ -170,12 +170,12 @@ namespace cvutils
         }
     }
 
-    ImageProcessResult ProcessImage(cv::Mat& img)
+    ImageProcessResult ProcessImage(cv::Mat& img, bool useSharpening/* = true*/)
     {
         BoundImage(img);
 
         ImageProcessResult res(img);
-        res.detectedObjects = SegmentObjects(img, true);
+        res.detectedObjects = SegmentObjects(img, useSharpening);
 
         for (int i = 0; i < res.detectedObjects.size(); i++)
         {
@@ -247,7 +247,6 @@ namespace cvutils
         Mat image;
         sourceImage.copyTo(image);
 
-        useLaplacianSharpening = false;
         if (useLaplacianSharpening)
         {
             ///Create a kernel that we will use for accuting/sharpening our image
@@ -476,7 +475,14 @@ namespace cvutils
             }
             else
             {
-                currEl = currElMaxValInfo.first;
+                if (group.end() == find(group.begin(), group.end(), currElMaxValInfo.first))
+                {
+                    currEl = currElMaxValInfo.first;
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 

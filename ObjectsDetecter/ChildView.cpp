@@ -69,7 +69,7 @@ void CChildView::ChangeStatus(Status status)
     case Status::IMAGE_PROCESSED:
         {
             _buttonLoadImage.EnableWindow(true);
-            _buttonProcessImage.EnableWindow(false);
+            _buttonProcessImage.EnableWindow(true);
             _buttonProcessImage.SetWindowText(L"Process");
             _buttonShowImageObjects.EnableWindow(true);
             _buttonShowObjectsGroups.EnableWindow(true);
@@ -115,7 +115,8 @@ afx_msg int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     wutils::CreateSimpleButton(&_buttonProcessImage, this, L"Process image");
     wutils::CreateSimpleButton(&_buttonShowImageObjects, this, L"Show objects");
     wutils::CreateSimpleButton(&_buttonShowObjectsGroups, this, L"Show objects groups");
-    
+    wutils::CreateSimpleCheckBox(&_checkBoxUseImageSharpening, this, L"Use image sharpening");
+
     _label.Create(
         L"",
         WS_VISIBLE | WS_CHILD | SS_CENTER,
@@ -156,6 +157,11 @@ afx_msg void CChildView::OnRangeCmds(UINT id)
     {
         OnShowTypes();
     }
+
+    if (id == _checkBoxUseImageSharpening.GetDlgCtrlID())
+    {
+        _useImageSharpening = !_useImageSharpening;
+    }
 }
 
 
@@ -186,7 +192,7 @@ afx_msg void CChildView::OnProcessImage()
     ChangeStatus(Status::IMAGE_PROCESSING);
     _processingImageTaskResult = async([this]()
     {
-        _processResult = cvutils::ProcessImage(_sourceImage);
+        _processResult = cvutils::ProcessImage(_sourceImage, this->_useImageSharpening);
         this->ChangeStatus(Status::IMAGE_PROCESSED);
     });
 }
@@ -246,7 +252,7 @@ afx_msg void CChildView::OnSize(UINT nType, int cx, int cy)
     constexpr int _buttonHeigth = 60;
 
     constexpr int marginX = 50;
-    constexpr int marginY = 20;
+    constexpr int marginY = 10;
     CRect thisRect = wutils::GetRectRelativeToParent(this);
     CPoint center = wutils::GetWindowCenter(this);
 
@@ -283,6 +289,12 @@ afx_msg void CChildView::OnSize(UINT nType, int cx, int cy)
     rect.right += marginX + btnSize.cx;
 
     _label.MoveWindow(rect);
+
+    int checkBoxWidth = 200;
+    int checkBoxHeight = 20;
+    CRect checkBoxRect(marginX, marginY + _buttonHeigth + marginY / 2, marginX + checkBoxWidth, marginY + _buttonHeigth + marginY / 2 + checkBoxHeight);
+    _checkBoxUseImageSharpening.MoveWindow(&checkBoxRect);
+    wutils::CenterWindowHorizontallyInParent(&_checkBoxUseImageSharpening);
 
     RedrawWindow();
 }
