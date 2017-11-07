@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "cvUtilities.h"
 
 
@@ -230,7 +230,7 @@ namespace cvutils
         return false;
     }
 
-    void SaveObjectImages(const ObjectsList& objects)
+    void SaveObjectsImages(const ObjectsList& objects)
     {
         vector<int> compression_params;
         compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -434,15 +434,19 @@ namespace cvutils
         return objectsInfo;
     }
 
-    pair<ObjectsList::const_iterator, double> FindMostSimilarObjectTo(const ObjectInfo& obj, const ObjectsList& objects);
+    map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>> FindTemplateMatchingValueMap(const ObjectsList& objects);
 
-    map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> FindMostSimilarObjectsMap(const ObjectsList& objects);
+    map<ObjectsList::const_iterator, double> FindTemplateMatchingValueMapFor(const ObjectInfo& obj, const ObjectsList& objects);
+
+    map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> FindMostMatchingTemplateMap(const ObjectsList& objects);
 
     ObjectIteratorList RemoveObjectsGroup(map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>>& maxValMap);
 
-    vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects)
+    ObjectIteratorList RemoveObjectsGroup(map<ObjectIterator, double>&);
+
+    /*vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects)
     {
-        auto maxValResultsMap = std::move(FindMostSimilarObjectsMap(objects));
+        auto maxValResultsMap = std::move(FindMostMatchingTemplateMap(objects));
         vector<ObjectIteratorList> objectsGroups;
 
         while (maxValResultsMap.size() > 0)
@@ -453,6 +457,104 @@ namespace cvutils
         }
 
         return objectsGroups;
+    }*/
+
+    map<ObjectIterator, double> FindObjectsClassificationParamMap(map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>>& templateMatchingValMap);
+
+    vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects)
+    {
+        map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>> templateMatchingValMap(std::move(
+            FindTemplateMatchingValueMap(objects)
+        ));
+        map<ObjectIterator, double> objectsClassificationParamMap(std::move(
+            FindObjectsClassificationParamMap(templateMatchingValMap)
+        ));
+
+#ifdef _DEBUG
+        for (auto it = objectsClassificationParamMap.begin(); objectsClassificationParamMap.end() != it; it++)
+        {
+            imshow(format("%f", it->second), it->first->image);
+            waitKey();
+        }
+#endif
+
+        vector<ObjectIteratorList> objectsGroups;
+        while (objectsClassificationParamMap.size() > 0)
+        {
+            objectsGroups.push_back(std::move(
+                RemoveObjectsGroup(objectsClassificationParamMap)
+            ));
+        }
+        
+        return objectsGroups;
+    }
+
+    map<ObjectIterator, double> FindObjectsClassificationParamMap(map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>>& templateMatchingValMap)
+    {
+        map<ObjectIterator, double> res;
+
+        int maxRowsCount = 0;
+        int maxColsCount = 0;
+
+        for (auto it = templateMatchingValMap.begin(); templateMatchingValMap.end() != it; it++)
+        {
+            auto& img = it->first->image;
+
+            if (img.cols > maxColsCount)
+            {
+                maxColsCount = img.cols;
+            }
+
+            if (img.rows > maxRowsCount)
+            {
+                maxRowsCount = img.rows;
+            }
+        }
+
+        for (auto it = templateMatchingValMap.begin(); templateMatchingValMap.end() != it; it++)
+        {
+            auto& currObj = it->first;
+            auto& currObjTemplateMap = templateMatchingValMap[currObj];
+
+            for (auto templIt = ++currObjTemplateMap.begin(); currObjTemplateMap.end() != templIt; templIt++)
+            {
+                res[currObj] += templIt->second;
+            }
+
+            res[currObj] /= currObjTemplateMap.size();
+
+            res[currObj] = (res[currObj] + (double)currObj->image.cols / maxColsCount + (double)currObj->image.rows / maxRowsCount) / 3;
+        }
+        return res;
+    }
+
+    ObjectIteratorList RemoveObjectsGroup(map<ObjectIterator, double>& m)
+    {
+        ObjectIteratorList group;
+
+        double groupVal = m.begin()->second;
+        double groupSumVal = groupVal;
+
+        group.push_back(m.begin()->first);
+        m.erase(m.begin());
+
+        for (auto it = m.begin(); m.end() != it; it++)
+        {
+            if (abs(it->second - groupVal) < 0.02)
+            {
+                group.push_back(it->first);
+
+                groupSumVal += it->second;
+                groupVal = groupSumVal / group.size();
+            }
+        }
+
+        for (auto it = group.begin(); group.end() != it; it++)
+        {
+            m.erase(*it);
+        }
+
+        return group;
     }
 
     ObjectIteratorList RemoveObjectsGroup(map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>>& maxValMap)
@@ -489,10 +591,48 @@ namespace cvutils
         return group;
     }
 
-    pair<ObjectsList::const_iterator, double> FindMostSimilarObjectTo(const ObjectInfo& obj, const ObjectsList& objects)
+    map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>> FindTemplateMatchingValueMap(const ObjectsList& objects)
+    {
+        map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>> res;
+
+        for (auto it = objects.begin(); objects.end() != it; it++)
+        {
+            res[it] = std::move(FindTemplateMatchingValueMapFor(*it, objects));
+        }
+        return res;
+    }
+
+    map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> FindMostMatchingTemplateMap(const ObjectsList& objects)
+    {
+        auto templateMatсhingValueMap = FindTemplateMatchingValueMap(objects);
+
+        map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> maxValResultsMap;
+        for (auto it = templateMatсhingValueMap.begin(); templateMatсhingValueMap.end() != it; it++)
+        {
+            auto& currObj = it->first;
+            auto& currObjTemplateMap = templateMatсhingValueMap[currObj];
+            auto& currobjTemplateMatchMaxValInfo = maxValResultsMap[currObj];
+
+            currobjTemplateMatchMaxValInfo.first = currObjTemplateMap.begin()->first;
+            currobjTemplateMatchMaxValInfo.second = currObjTemplateMap.begin()->second;
+
+            for (auto templIt = ++currObjTemplateMap.begin(); currObjTemplateMap.end() != templIt; templIt++)
+            {
+                if (templIt->second > currobjTemplateMatchMaxValInfo.second)
+                {
+                    currobjTemplateMatchMaxValInfo.first = templIt->first;
+                    currobjTemplateMatchMaxValInfo.second = templIt->second;
+                }
+            }
+        }
+
+        return maxValResultsMap;
+    }
+
+    map<ObjectsList::const_iterator, double> FindTemplateMatchingValueMapFor(const ObjectInfo& obj, const ObjectsList& objects)
     {
         const Mat& img = obj.image;
-        pair<ObjectsList::const_iterator, double> res;
+        map<ObjectsList::const_iterator, double> res;
 
         for (auto templateIt = objects.begin(); objects.end() != templateIt; templateIt++)
         {
@@ -544,25 +684,10 @@ namespace cvutils
             //normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
             minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
 
-            if (maxVal > res.second)
-            {
-                res.first = templateIt;
-                res.second = maxVal;
-            }
+            res[templateIt] = maxVal;
         }
 
         return res;
-    }
-
-    map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> FindMostSimilarObjectsMap(const ObjectsList& objects)
-    {
-        map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> maxValResultsMap;
-        for (auto objIt = objects.begin(); objects.end() != objIt; objIt++)
-        {
-            maxValResultsMap[objIt] = std::move(FindMostSimilarObjectTo(*objIt, objects));
-        }
-
-        return maxValResultsMap;
     }
 
 }
