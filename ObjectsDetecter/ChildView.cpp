@@ -188,7 +188,7 @@ afx_msg void CChildView::OnShowObjects()
 
 afx_msg void CChildView::OnShowTypes()
 {
-    SetMatImage(_processResult.typesImage);
+    SetMatImage(_processResult.groupsImage);
 
     CString res;
     res.Format(L"Groups info");

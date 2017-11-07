@@ -1,17 +1,10 @@
-
-// MainFrm.cpp : implementation of the CMainFrame class
-//
-
 #include "stdafx.h"
 #include "ObjectsDetecter.h"
-
 #include "MainFrm.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
-// CMainFrame
 
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
@@ -19,8 +12,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_SETFOCUS()
 END_MESSAGE_MAP()
-
-// CMainFrame construction/destruction
 
 CMainFrame::CMainFrame()
 {

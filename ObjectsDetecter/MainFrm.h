@@ -1,7 +1,3 @@
-
-// MainFrm.h : interface of the CMainFrame class
-//
-
 #pragma once
 #include "ChildView.h"
 

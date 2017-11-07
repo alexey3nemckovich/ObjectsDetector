@@ -10,14 +10,10 @@
 #endif
 
 
-// CObjectsDetecterApp
-
 BEGIN_MESSAGE_MAP(CObjectsDetecterApp, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CObjectsDetecterApp::OnAppAbout)
 END_MESSAGE_MAP()
 
-
-// CObjectsDetecterApp construction
 
 CObjectsDetecterApp::CObjectsDetecterApp()
 {

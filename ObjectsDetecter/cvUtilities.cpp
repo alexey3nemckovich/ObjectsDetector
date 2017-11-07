@@ -152,25 +152,43 @@ namespace cvutils
 
     ObjectsList SegmentObjects(const Mat& sourceImage, bool useLaplacianSharpening);
 
-    ObjectsGroupsMap FindObjectsGroups(const ObjectsList& objects);
+    vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects);
 
-    ImageProcessResult ProcessImage(const cv::Mat& img)
+    void BoundImage(Mat& image)
     {
+        constexpr int imageMaxWidth = 800;
+        constexpr int imageMaxHeight = 800;
+
+        if (image.rows > 500)
+        {
+            ResizeImageToRowsCount(500, image);
+        }
+
+        if (image.cols > 800)
+        {
+            ResizeImageToColsCount(800, image);
+        }
+    }
+
+    ImageProcessResult ProcessImage(cv::Mat& img)
+    {
+        BoundImage(img);
+
         ImageProcessResult res(img);
         res.detectedObjects = SegmentObjects(img, true);
 
         for (int i = 0; i < res.detectedObjects.size(); i++)
         {
-            rectangle(res.objectsImage, res.detectedObjects[i].sourceImageRect, GetRandomColor(), 3);
+            rectangle(res.objectsImage, res.detectedObjects[i].sourceImageRect, GetRandomColor(), 2);
         }
 
-        res.detectedObjectsGroupsMap = FindObjectsGroups(res.detectedObjects);
-        for (auto it = res.detectedObjectsGroupsMap.begin(); res.detectedObjectsGroupsMap.end() != it; it++)
+        auto& objGroups = res.detectedObjectsGroups = std::move(FindObjectsGroups(res.detectedObjects));
+        for (auto groupIt = objGroups.begin(); objGroups.end() != groupIt; groupIt++)
         {
-            auto groupColor = GetRandomColor();
-            for (int i = 0; i < it->second.size(); it++)
+            auto typeColor = GetRandomColor();
+            for (auto groupObjectsIt = groupIt->begin(); groupIt->end() != groupObjectsIt; groupObjectsIt++)
             {
-                rectangle(res.groupsImage, it->second[i]->sourceImageRect, groupColor, 3);
+                rectangle(res.groupsImage, (*groupObjectsIt)->sourceImageRect, typeColor, 2);
             }
         }
 
@@ -192,6 +210,16 @@ namespace cvutils
         nextObjectID++;
     }
 
+    bool operator==(const ObjectInfo& a, const ObjectInfo& b)
+    {
+        if (a.id == b.id)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     void SaveObjectImages(const ObjectsList& objects)
     {
         vector<int> compression_params;
@@ -209,6 +237,7 @@ namespace cvutils
         Mat image;
         sourceImage.copyTo(image);
 
+        useLaplacianSharpening = false;
         if (useLaplacianSharpening)
         {
             ///Create a kernel that we will use for accuting/sharpening our image
@@ -396,76 +425,128 @@ namespace cvutils
         return objectsInfo;
     }
 
-    map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> FindObjectsGroups(const ObjectsList& objects)
+    pair<ObjectsList::const_iterator, double> FindMostSimilarObjectTo(const ObjectInfo& obj, const ObjectsList& objects);
+
+    map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> FindMostSimilarObjectsMap(const ObjectsList& objects);
+
+    ObjectIteratorList RemoveObjectsGroup(map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>>& maxValMap);
+
+    vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects)
+    {
+        auto maxValResultsMap = std::move(FindMostSimilarObjectsMap(objects));
+        vector<ObjectIteratorList> objectsGroups;
+
+        while (maxValResultsMap.size() > 0)
+        {
+            objectsGroups.push_back(std::move(
+                RemoveObjectsGroup(maxValResultsMap)
+            ));
+        }
+
+        return objectsGroups;
+    }
+
+    ObjectIteratorList RemoveObjectsGroup(map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>>& maxValMap)
+    {
+        ObjectIteratorList group;
+
+        auto currEl = maxValMap.begin()->first;
+        while (true)
+        {
+            pair<ObjectsList::const_iterator, double> currElMaxValInfo(std::move(
+                maxValMap[currEl]
+            ));
+
+            maxValMap.erase(currEl);
+            group.push_back(currEl);
+
+            if (currElMaxValInfo.second < 0.5)
+            {
+                break;
+            }
+            else
+            {
+                currEl = currElMaxValInfo.first;
+            }
+        }
+
+        return group;
+    }
+
+    pair<ObjectsList::const_iterator, double> FindMostSimilarObjectTo(const ObjectInfo& obj, const ObjectsList& objects)
+    {
+        const Mat& img = obj.image;
+        pair<ObjectsList::const_iterator, double> res;
+
+        for (auto templateIt = objects.begin(); objects.end() != templateIt; templateIt++)
+        {
+            if (*templateIt == obj)
+            {
+                continue;
+            }
+
+            const Mat& templ = templateIt->image;
+
+            Mat result;
+            double minVal, maxVal;
+            Point minLoc, maxLoc;
+
+            if (img.rows < templ.rows ||
+                img.cols < templ.cols)
+            {
+                int vertBorder = 0;
+                int horzBorder = 0;
+
+                Mat sizedImage;
+                img.copyTo(sizedImage);
+
+                if (sizedImage.rows < templ.rows)
+                {
+                    ResizeImageToRowsCount(templ.rows, sizedImage);
+                }
+
+                if (sizedImage.cols < templ.cols)
+                {
+                    ResizeImageToColsCount(templ.cols, sizedImage);
+                }
+
+                int result_cols = sizedImage.cols - templ.cols + 1;
+                int result_rows = sizedImage.rows - templ.rows + 1;
+
+                result.create(result_rows, result_cols, CV_32FC1);
+                matchTemplate(sizedImage, templ, result, TM_CCOEFF_NORMED);
+            }
+            else
+            {
+                int result_cols = img.cols - templ.cols + 1;
+                int result_rows = img.rows - templ.rows + 1;
+
+                result.create(result_rows, result_cols, CV_32FC1);
+                matchTemplate(img, templ, result, TM_CCOEFF_NORMED);
+            }
+
+            //normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
+            minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
+
+            if (maxVal > res.second)
+            {
+                res.first = templateIt;
+                res.second = maxVal;
+            }
+        }
+
+        return res;
+    }
+
+    map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> FindMostSimilarObjectsMap(const ObjectsList& objects)
     {
         map<ObjectsList::const_iterator, pair<ObjectsList::const_iterator, double>> maxValResultsMap;
         for (auto objIt = objects.begin(); objects.end() != objIt; objIt++)
         {
-            const Mat& img = objIt->image;
-
-            for (auto templateIt = objects.begin(); objects.end() != templateIt; templateIt++)
-            {
-                if (templateIt == objIt)
-                {
-                    continue;
-                }
-
-                const Mat& templ = templateIt->image;
-
-                Mat result;
-                double minVal, maxVal;
-                Point minLoc, maxLoc;
-
-                if (img.rows < templ.rows ||
-                    img.cols < templ.cols)
-                {
-                    int vertBorder = 0;
-                    int horzBorder = 0;
-
-                    Mat sizedImage;
-                    img.copyTo(sizedImage);
-
-                    if (sizedImage.rows < templ.rows)
-                    {
-                        ResizeImageToRowsCount(templ.rows, sizedImage);
-                    }
-
-                    if (sizedImage.cols < templ.cols)
-                    {
-                        ResizeImageToColsCount(templ.cols, sizedImage);
-                    }
-
-                    int result_cols = sizedImage.cols - templ.cols + 1;
-                    int result_rows = sizedImage.rows - templ.rows + 1;
-
-                    result.create(result_rows, result_cols, CV_32FC1);
-                    matchTemplate(sizedImage, templ, result, TM_CCOEFF_NORMED);
-                }
-                else
-                {
-                    int result_cols = img.cols - templ.cols + 1;
-                    int result_rows = img.rows - templ.rows + 1;
-
-                    result.create(result_rows, result_cols, CV_32FC1);
-                    matchTemplate(img, templ, result, TM_CCOEFF_NORMED);
-                }
-
-                //normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
-                minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
-
-                if (maxVal > maxValResultsMap[objIt].second)
-                {
-                    maxValResultsMap[objIt].first = templateIt;
-                    maxValResultsMap[objIt].second = maxVal;
-                }
-            }
+            maxValResultsMap[objIt] = std::move(FindMostSimilarObjectTo(*objIt, objects));
         }
 
-        map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> objectsTypesLists;
-
-
-
-        return objectsTypesLists;
+        return maxValResultsMap;
     }
 
 }

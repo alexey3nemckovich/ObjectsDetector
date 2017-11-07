@@ -38,11 +38,16 @@ namespace cvutils
     private:
         int id = 0;
         static int nextObjectID;
+
+        friend bool operator==(const ObjectInfo& a, const ObjectInfo& b);
     };
 
+    bool operator==(const ObjectInfo& a, const ObjectInfo& b);
+
     typedef vector<ObjectInfo> ObjectsList;
-    typedef vector<ObjectsList::iterator> PobjectsList;
-    typedef map<ObjectsList::const_iterator, vector<ObjectsList::const_iterator>> ObjectsGroupsMap;
+
+    typedef ObjectsList::const_iterator ObjectIterator;
+    typedef vector<ObjectIterator> ObjectIteratorList;
 
     void SaveObjectImages(const ObjectsList& objects);
 
@@ -50,12 +55,12 @@ namespace cvutils
     {
         ImageProcessResult() = default;
         ImageProcessResult(const cv::Mat&);
-        Mat typesImage;
+        Mat groupsImage;
         Mat objectsImage;
         ObjectsList detectedObjects;
-        ObjectsGroupsMap detectedObjectsGroupsMap;
+        vector<ObjectIteratorList> detectedObjectsGroups;
     };
 
-    ImageProcessResult ProcessImage(const cv::Mat& img);
+    ImageProcessResult ProcessImage(cv::Mat& img);
 
 }
