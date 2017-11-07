@@ -2,6 +2,7 @@
 #include "ObjectsDetecter.h"
 #include "ChildView.h"
 #include "WindowUtilities.h"
+#include <future>
 #include <opencv2/imgcodecs.hpp>
 
 #ifdef _DEBUG
@@ -56,9 +57,20 @@ void CChildView::ChangeStatus(Status status)
             _label.SetWindowText(L"");
         }
         break;
+    case Status::IMAGE_PROCESSING:
+        {
+            _buttonLoadImage.EnableWindow(false);
+            _buttonProcessImage.EnableWindow(false);
+            _buttonProcessImage.SetWindowText(L"Processing");
+            _buttonShowImageObjects.EnableWindow(false);
+            _buttonShowObjectsGroups.EnableWindow(false);
+        }
+        break;
     case Status::IMAGE_PROCESSED:
         {
+            _buttonLoadImage.EnableWindow(true);
             _buttonProcessImage.EnableWindow(false);
+            _buttonProcessImage.SetWindowText(L"Process");
             _buttonShowImageObjects.EnableWindow(true);
             _buttonShowObjectsGroups.EnableWindow(true);
         }
@@ -171,8 +183,12 @@ afx_msg void CChildView::OnLoadImage()
 
 afx_msg void CChildView::OnProcessImage()
 {
-    _processResult = cvutils::ProcessImage(_sourceImage);
-    ChangeStatus(Status::IMAGE_PROCESSED);
+    ChangeStatus(Status::IMAGE_PROCESSING);
+    _processingImageTaskResult = async([this]()
+    {
+        _processResult = cvutils::ProcessImage(_sourceImage);
+        this->ChangeStatus(Status::IMAGE_PROCESSED);
+    });
 }
 
 
@@ -196,13 +212,9 @@ afx_msg void CChildView::OnShowTypes()
 }
 
 
-afx_msg void CChildView::OnPaint() 
+afx_msg void CChildView::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-	
-	// TODO: Add your message handler code here
-	
-	// Do not call CWnd::OnPaint() for painting messages
+	CPaintDC dc(this);
 }
 
 

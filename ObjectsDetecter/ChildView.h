@@ -2,6 +2,7 @@
 #include "SyncLabel.h"
 #include "cvUtilities.h"
 #include <opencv2/imgcodecs.hpp>
+#include <future>
 
 
 class CChildView : public CWnd
@@ -14,7 +15,8 @@ public:
     {
         IMAGE_NOT_LOADED,
         IMAGE_LOADED,
-        IMAGE_PROCESSED,
+        IMAGE_PROCESSING,
+        IMAGE_PROCESSED
     };
 
 protected:
@@ -22,6 +24,7 @@ protected:
 
 protected:
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnPaint();
     afx_msg void OnRangeCmds(UINT id);
@@ -54,7 +57,8 @@ private:
     cvutils::ImageProcessResult _processResult;
 
 private:
+    std::future<void> _processingImageTaskResult;
+
+private:
     const int _instrumentsPanelHeight = 100;
-public:
-    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
