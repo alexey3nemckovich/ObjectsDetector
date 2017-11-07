@@ -206,8 +206,26 @@ afx_msg void CChildView::OnShowTypes()
 {
     SetMatImage(_processResult.groupsImage);
 
-    CString res;
-    res.Format(L"Groups info");
+    int j = 0;
+    wstringstream str;
+    for (int i = 0; i < _processResult.detectedObjectsGroups.size(); i++)
+    {
+        str << "Group" << i << "(" << _processResult.detectedObjectsGroups[i].size() << ")";
+        j++;
+
+        if (j == 0)
+        {
+            str << " ";
+        }
+
+        if (j == 2)
+        {
+            str << "\n\r";
+            j = 0;
+        }
+    }
+
+    CString res(str.str().c_str());
     _label.SetWindowText(res);
 }
 

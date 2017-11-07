@@ -182,11 +182,21 @@ namespace cvutils
             rectangle(res.objectsImage, res.detectedObjects[i].sourceImageRect, GetRandomColor(), 2);
         }
 
+        int dy = 20;
+        int dx = 100;
+        cv::Point p(10, dy);
         auto& objGroups = res.detectedObjectsGroups = std::move(FindObjectsGroups(res.detectedObjects));
-        for (auto groupIt = objGroups.begin(); objGroups.end() != groupIt; groupIt++)
+        for (int i = 0; i < objGroups.size(); i++)
         {
             auto typeColor = GetRandomColor();
-            for (auto groupObjectsIt = groupIt->begin(); groupIt->end() != groupObjectsIt; groupObjectsIt++)
+
+            Point rightPoint(p.x + dx, p.y);
+            line(res.groupsImage, p, rightPoint, typeColor, 2);
+            rightPoint.x += 5;
+            putText(res.groupsImage, format("%d", i), rightPoint, FONT_HERSHEY_COMPLEX_SMALL, 0.8, typeColor, 2);
+            p.y += dy;
+
+            for (auto groupObjectsIt = objGroups[i].begin(); objGroups[i].end() != groupObjectsIt; groupObjectsIt++)
             {
                 rectangle(res.groupsImage, (*groupObjectsIt)->sourceImageRect, typeColor, 2);
             }
