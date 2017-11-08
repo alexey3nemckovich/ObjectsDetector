@@ -421,7 +421,124 @@ namespace cvutils
 
     ObjectIteratorList RemoveObjectsGroup(map<ObjectIterator, double>&);
 
+    ObjectIteratorList RemoveObjectsGroup(map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>>&);
+
     vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects)
+    {
+        auto maxValResultsMap = std::move(FindTemplateMatchingValueMap(objects));
+        vector<ObjectIteratorList> objectsGroups;
+
+        while (maxValResultsMap.size() > 0)
+        {
+            objectsGroups.push_back(std::move(
+                RemoveObjectsGroup(maxValResultsMap)
+            ));
+        }
+
+        return objectsGroups;
+    }
+
+    ObjectIteratorList RemoveObjectsGroup(map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>>& m)
+    {
+        ObjectIteratorList group;
+
+        group.push_back(m.begin()->first);
+        
+        while (true)
+        {
+            ObjectIteratorList newGroupElements;
+
+            for (auto it = m.begin(); m.end() != it; it++)
+            {
+                //Check if element is already in group
+                if (group.end() != find(group.begin(), group.end(), it->first))
+                {
+                    continue;
+                }
+
+                //Check if element is similar to all group elements
+                bool isNewGroupElement = true;
+                for (auto it2 = group.begin(); group.end() != it2; it2++)
+                {
+                    if (m[it->first][*it2] < 0.5)
+                    {
+                        isNewGroupElement = false;
+                        break;
+                    }
+                }
+
+                if (isNewGroupElement)
+                {
+                    newGroupElements.push_back(it->first);
+                }
+            }
+
+            if (newGroupElements.size() > 0)
+            {
+                group.insert(group.end(), newGroupElements.begin(), newGroupElements.end());
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        //Remove elements from group, that are no similar to all group elements
+        while (true)
+        {
+            ObjectIteratorList noGroupElements;
+
+            for (int i = 0; i < group.size(); i++)
+            {
+                for (int i2 = 0; i2 < group.size(); i2++)
+                {
+                    if (i == i2)
+                    {
+                        continue;
+                    }
+
+                    if (noGroupElements.end() != find(noGroupElements.begin(), noGroupElements.end(), group[i]))
+                    {
+                        continue;
+                    }
+
+                    if (m[group[i]][group[i2]] < 0.5)
+                    {
+                        noGroupElements.push_back(group[i]);
+                        break;
+                    }
+                }
+            }
+
+            if (noGroupElements.size() > 0)
+            {
+                for (int i = 0; i < noGroupElements.size(); i++)
+                {
+                    group.erase(
+                        find(group.begin(), group.end(), noGroupElements[i])
+                    );
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (0 == group.size())
+        {
+            group.push_back(m.begin()->first);
+        }
+
+        for (auto& groupEl : group)
+        {
+            m.erase(groupEl);
+        }
+
+        return group;
+    }
+
+    /*vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects)
     {
         auto maxValResultsMap = std::move(FindMostMatchingTemplateMap(objects));
         vector<ObjectIteratorList> objectsGroups;
@@ -434,7 +551,7 @@ namespace cvutils
         }
 
         return objectsGroups;
-    }
+    }*/
 
     map<ObjectIterator, double> FindObjectsClassificationParamMap(map<ObjectsList::const_iterator, map<ObjectsList::const_iterator, double>>& templateMatchingValMap);
 
@@ -473,36 +590,36 @@ namespace cvutils
         int maxRowsCount = 0;
         int maxColsCount = 0;
 
-for (auto it = templateMatchingValMap.begin(); templateMatchingValMap.end() != it; it++)
-{
-    auto& img = it->first->image;
+        for (auto it = templateMatchingValMap.begin(); templateMatchingValMap.end() != it; it++)
+        {
+            auto& img = it->first->image;
 
-    if (img.cols > maxColsCount)
-    {
-        maxColsCount = img.cols;
-    }
+            if (img.cols > maxColsCount)
+            {
+                maxColsCount = img.cols;
+            }
 
-    if (img.rows > maxRowsCount)
-    {
-        maxRowsCount = img.rows;
-    }
-}
+            if (img.rows > maxRowsCount)
+            {
+                maxRowsCount = img.rows;
+            }
+        }
 
-for (auto it = templateMatchingValMap.begin(); templateMatchingValMap.end() != it; it++)
-{
-    auto& currObj = it->first;
-    auto& currObjTemplateMap = templateMatchingValMap[currObj];
+        for (auto it = templateMatchingValMap.begin(); templateMatchingValMap.end() != it; it++)
+        {
+            auto& currObj = it->first;
+            auto& currObjTemplateMap = templateMatchingValMap[currObj];
 
-    for (auto templIt = ++currObjTemplateMap.begin(); currObjTemplateMap.end() != templIt; templIt++)
-    {
-        res[currObj] += templIt->second;
-    }
+            for (auto templIt = ++currObjTemplateMap.begin(); currObjTemplateMap.end() != templIt; templIt++)
+            {
+                res[currObj] += templIt->second;
+            }
 
-    res[currObj] /= currObjTemplateMap.size();
+            res[currObj] /= currObjTemplateMap.size();
 
-    res[currObj] = (res[currObj] + (double)currObj->image.cols / maxColsCount + (double)currObj->image.rows / maxRowsCount) / 3;
-}
-return res;
+            res[currObj] = (res[currObj] + (double)currObj->image.cols / maxColsCount + (double)currObj->image.rows / maxRowsCount) / 3;
+        }
+        return res;
     }
 
     ObjectIteratorList RemoveObjectsGroup(map<ObjectIterator, double>& m)
