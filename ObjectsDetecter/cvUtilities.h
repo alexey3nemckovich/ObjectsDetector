@@ -49,7 +49,7 @@ namespace cvutils
     typedef ObjectsList::const_iterator ObjectIterator;
     typedef vector<ObjectIterator> ObjectIteratorList;
 
-    void SaveObjectImages(const ObjectsList& objects);
+    void SaveObjectsImages(const ObjectsList& objects);
 
     struct ImageProcessResult
     {

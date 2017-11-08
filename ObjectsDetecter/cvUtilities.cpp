@@ -193,7 +193,7 @@ namespace cvutils
             Point rightPoint(p.x + dx, p.y);
             line(res.groupsImage, p, rightPoint, typeColor, 2);
             rightPoint.x += 5;
-            putText(res.groupsImage, format("%d", i), rightPoint, FONT_HERSHEY_COMPLEX_SMALL, 0.8, typeColor, 2);
+            putText(res.groupsImage, format("group%d", i), rightPoint, FONT_HERSHEY_TRIPLEX, 0.8, typeColor, 2);
             p.y += dy;
 
             for (auto groupObjectsIt = objGroups[i].begin(); objGroups[i].end() != groupObjectsIt; groupObjectsIt++)

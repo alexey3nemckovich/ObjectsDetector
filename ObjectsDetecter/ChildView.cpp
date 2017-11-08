@@ -216,10 +216,10 @@ afx_msg void CChildView::OnShowTypes()
     wstringstream str;
     for (int i = 0; i < _processResult.detectedObjectsGroups.size(); i++)
     {
-        str << "Group" << i << "(" << _processResult.detectedObjectsGroups[i].size() << ")";
+        str << "group" << i << "(" << _processResult.detectedObjectsGroups[i].size() << ")";
         j++;
 
-        if (j == 0)
+        if (j == 1)
         {
             str << " ";
         }
