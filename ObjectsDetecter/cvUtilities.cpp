@@ -150,10 +150,10 @@ namespace cvutils
         mat.copyTo(objectsImage);
     }
 
-    ObjectsList SegmentObjects(const Mat& sourceImage, bool useLaplacianSharpening);
+    ObjectsList SegmentObjects(const Mat& sourceImage);
 
     vector<ObjectIteratorList> FindObjectsGroups(const ObjectsList& objects);
-
+    
     void BoundImage(Mat& image)
     {
         constexpr int imageMaxWidth = 800;
@@ -170,12 +170,12 @@ namespace cvutils
         }
     }
 
-    ImageProcessResult ProcessImage(cv::Mat& img, bool useSharpening/* = true*/)
+    ImageProcessResult ProcessImage(cv::Mat& img)
     {
         BoundImage(img);
 
         ImageProcessResult res(img);
-        res.detectedObjects = SegmentObjects(img, useSharpening);
+        res.detectedObjects = SegmentObjects(img);
 
         for (int i = 0; i < res.detectedObjects.size(); i++)
         {
@@ -242,33 +242,10 @@ namespace cvutils
         }
     }
 
-    ObjectsList SegmentObjects(const Mat& sourceImage, bool useLaplacianSharpening)
+    ObjectsList SegmentObjects(const Mat& sourceImage)
     {
         Mat image;
         sourceImage.copyTo(image);
-
-        if (useLaplacianSharpening)
-        {
-            ///Create a kernel that we will use for accuting/sharpening our image
-            Mat kernel = (Mat_<float>(3, 3) <<
-                1, 1, 1,
-                1, -8, 1,
-                1, 1, 1
-                );
-            Mat imgLaplacian;
-            Mat sharp = image;
-            filter2D(sharp, imgLaplacian, CV_32F, kernel);
-            image.convertTo(sharp, CV_32F);
-            Mat imgResult = sharp - imgLaplacian;
-
-            imgResult.convertTo(imgResult, CV_8UC3);
-            image = imgResult;
-
-#ifdef _DEBUG
-            imshow("After laplacian", image);
-            waitKey();
-#endif
-        }
 
         ///Get binary image from source
         Mat binaryImage;

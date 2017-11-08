@@ -19,6 +19,13 @@ public:
         IMAGE_PROCESSED
     };
 
+    enum class Tab
+    {
+        SOURCE_IMAGE,
+        IMAGE_OBJECTS,
+        IMAGE_OBJECTS_GROUPS
+    };
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
@@ -28,10 +35,10 @@ protected:
     afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnPaint();
     afx_msg void OnRangeCmds(UINT id);
-    afx_msg void OnLoadImage();
-    afx_msg void OnProcessImage();
-    afx_msg void OnShowObjects();
-    afx_msg void OnShowTypes();
+    afx_msg void OnLoadImageClick();
+    afx_msg void OnProcessImageClick();
+    afx_msg void OnShowObjectsClick();
+    afx_msg void OnShowTypesClick();
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -39,26 +46,22 @@ private:
     void SetMatImage(const cv::Mat&);
 
 private:
+    int _cx;
+    int _cy;
+
+private:
     CStatic _label;
     CButton _buttonLoadImage;
     CButton _buttonProcessImage;
     CButton _buttonShowImageObjects;
     CButton _buttonShowObjectsGroups;
-    CButton _checkBoxUseImageSharpening;
 
 private:
+    Tab _tab;
     Status _status;
 
 private:
-    int _cx;
-    int _cy;
-
-private:
-    bool _useImageSharpening = false;
-
-private:
     cv::Mat _sourceImage;
-    cvutils::ImageProcessResult _processResult;
 
 private:
     std::future<void> _processingImageTaskResult;

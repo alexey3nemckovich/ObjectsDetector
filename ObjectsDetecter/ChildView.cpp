@@ -1,9 +1,12 @@
 #include "stdafx.h"
-#include "ObjectsDetecter.h"
-#include "ChildView.h"
 #include "WindowUtilities.h"
 #include <future>
+//
+#include "ObjectsDetecter.h"
+#include "ChildView.h"
+//
 #include <opencv2/imgcodecs.hpp>
+#include "ImageProcesser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -12,7 +15,7 @@
 
 CChildView::CChildView()
 {
-
+    _tab = Tab::SOURCE_IMAGE;
 }
 
 
@@ -115,7 +118,6 @@ afx_msg int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     wutils::CreateSimpleButton(&_buttonProcessImage, this, L"Process image");
     wutils::CreateSimpleButton(&_buttonShowImageObjects, this, L"Show objects");
     wutils::CreateSimpleButton(&_buttonShowObjectsGroups, this, L"Show objects groups");
-    wutils::CreateSimpleCheckBox(&_checkBoxUseImageSharpening, this, L"Use image sharpening");
 
     _label.Create(
         L"",
@@ -140,32 +142,27 @@ afx_msg void CChildView::OnRangeCmds(UINT id)
 {
     if (id == _buttonLoadImage.GetDlgCtrlID())
     {
-        OnLoadImage();
+        OnLoadImageClick();
     }
 
     if (id == _buttonProcessImage.GetDlgCtrlID())
     {
-        OnProcessImage();
+        OnProcessImageClick();
     }
 
     if (id == _buttonShowImageObjects.GetDlgCtrlID())
     {
-        OnShowObjects();
+        OnShowObjectsClick();
     }
 
     if (id == _buttonShowObjectsGroups.GetDlgCtrlID())
     {
-        OnShowTypes();
-    }
-
-    if (id == _checkBoxUseImageSharpening.GetDlgCtrlID())
-    {
-        _useImageSharpening = !_useImageSharpening;
+        OnShowTypesClick();
     }
 }
 
 
-afx_msg void CChildView::OnLoadImage()
+afx_msg void CChildView::OnLoadImageClick()
 {
     CFileDialog dialog(true);
 
@@ -187,36 +184,39 @@ afx_msg void CChildView::OnLoadImage()
 }
 
 
-afx_msg void CChildView::OnProcessImage()
+afx_msg void CChildView::OnProcessImageClick()
 {
     ChangeStatus(Status::IMAGE_PROCESSING);
+
     _processingImageTaskResult = async([this]()
     {
-        _processResult = cvutils::ProcessImage(_sourceImage, this->_useImageSharpening);
+        ImageProcesser::GetInstance().ProcessImage(_sourceImage);
         this->ChangeStatus(Status::IMAGE_PROCESSED);
     });
 }
 
 
-afx_msg void CChildView::OnShowObjects()
+afx_msg void CChildView::OnShowObjectsClick()
 {
-    SetMatImage(_processResult.objectsImage);
+    const auto& lastProcResult = ImageProcesser::GetInstance().GetLastImageProcessResult();
+    SetMatImage(lastProcResult.objectsImage);
 
     CString res;
-    res.Format(L"Total objects count %d", _processResult.detectedObjects.size());
+    res.Format(L"Total objects count %d", lastProcResult.detectedObjects.size());
     _label.SetWindowText(res);
 }
 
 
-afx_msg void CChildView::OnShowTypes()
+afx_msg void CChildView::OnShowTypesClick()
 {
-    SetMatImage(_processResult.groupsImage);
+    const auto& lastProcResult = ImageProcesser::GetInstance().GetLastImageProcessResult();
+    SetMatImage(lastProcResult.groupsImage);
 
     int j = 0;
     wstringstream str;
-    for (int i = 0; i < _processResult.detectedObjectsGroups.size(); i++)
+    for (int i = 0; i < lastProcResult.detectedObjectsGroups.size(); i++)
     {
-        str << "group" << i << "(" << _processResult.detectedObjectsGroups[i].size() << ")";
+        str << "group" << i << "(" << lastProcResult.detectedObjectsGroups[i].size() << ")";
         j++;
 
         if (j == 1)
@@ -289,12 +289,6 @@ afx_msg void CChildView::OnSize(UINT nType, int cx, int cy)
     rect.right += marginX + btnSize.cx;
 
     _label.MoveWindow(rect);
-
-    int checkBoxWidth = 200;
-    int checkBoxHeight = 20;
-    CRect checkBoxRect(marginX, marginY + _buttonHeigth + marginY / 2, marginX + checkBoxWidth, marginY + _buttonHeigth + marginY / 2 + checkBoxHeight);
-    _checkBoxUseImageSharpening.MoveWindow(&checkBoxRect);
-    wutils::CenterWindowHorizontallyInParent(&_checkBoxUseImageSharpening);
 
     RedrawWindow();
 }

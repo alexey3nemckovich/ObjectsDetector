@@ -81,6 +81,9 @@
     <ClInclude Include="cvUtilities.h">
       <Filter>Header Files\cv</Filter>
     </ClInclude>
+    <ClInclude Include="ImageProcesser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ObjectsDetecter.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="cvUtilities.cpp">
       <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcesser.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
