@@ -206,6 +206,12 @@
   <ItemGroup>
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="CommonUtilities.cpp" />
+    <ClCompile Include="cvClassifyingAlg1.cpp" />
+    <ClCompile Include="cvClassifyingAlg2.cpp" />
+    <ClCompile Include="cvClassifyingAlg3.cpp" />
+    <ClCompile Include="cvClassifyingAlgsSupport.cpp" />
+    <ClCompile Include="cvImageProcessingUtils.cpp" />
+    <ClCompile Include="cvObjectInfo.cpp" />
     <ClCompile Include="cvUtilities.cpp" />
     <ClCompile Include="IDGenerator.cpp" />
     <ClCompile Include="ImageProcesser.cpp" />

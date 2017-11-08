@@ -12,7 +12,7 @@ using namespace cv;
 
 namespace cvutils
 {
-    
+    //Image mat processing utils
     void ResizeImageToRowsCount(int rowsCount, Mat& image);
 
     void ResizeImageToColsCount(int colsCount, Mat& image);
@@ -23,6 +23,7 @@ namespace cvutils
 
     auto ConvertCVMatToBMP(const cv::Mat& frame)->HBITMAP;
 
+    //Computer vision utils
     struct ObjectInfo
     {
     public:
@@ -31,6 +32,9 @@ namespace cvutils
     public:
         Mat image;
         Rect sourceImageRect;
+
+    public:
+        static const int UNDEFINED_COORDINATE = -1;
 
     public:
         cv::String name;
@@ -47,9 +51,18 @@ namespace cvutils
     typedef vector<ObjectInfo> ObjectsList;
 
     typedef ObjectsList::const_iterator ObjectIterator;
+
     typedef vector<ObjectIterator> ObjectIteratorList;
 
     void SaveObjectsImages(const ObjectsList& objects);
+
+    typedef vector<ObjectIteratorList> (*ObjectsClassifyingAlgorithm)(const ObjectsList& objects);
+
+    vector<ObjectIteratorList> ObjectsClassifyingAlg1(const ObjectsList& objects);
+
+    vector<ObjectIteratorList> ObjectsClassifyingAlg2(const ObjectsList& objects);
+
+    vector<ObjectIteratorList> ObjectsClassifyingAlg3(const ObjectsList& objects);
 
     struct ImageProcessResult
     {
@@ -61,6 +74,6 @@ namespace cvutils
         vector<ObjectIteratorList> detectedObjectsGroups;
     };
 
-    ImageProcessResult ProcessImage(cv::Mat& img);
+    ImageProcessResult ProcessImage(cv::Mat& img, ObjectsClassifyingAlgorithm classifyingAlgorithm);
 
 }

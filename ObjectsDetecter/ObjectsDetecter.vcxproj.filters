@@ -122,6 +122,24 @@
     <ClCompile Include="ImageProcesser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cvClassifyingAlg1.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="cvClassifyingAlg2.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="cvClassifyingAlg3.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="cvImageProcessingUtils.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="cvObjectInfo.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="cvClassifyingAlgsSupport.cpp">
+      <Filter>Source Files\cv</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ObjectsDetecter.rc">
