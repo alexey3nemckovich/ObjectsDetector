@@ -9,7 +9,7 @@ class ImageProcesser
 public:
     static ImageProcesser& GetInstance();
 
-    enum class Algorithm
+    enum class ObjectsClassifyingAlgorithmName
     {
         Alg1,
         Alg2,
@@ -21,7 +21,7 @@ public:
 
 public:
     const ImageProcessResult& ProcessImage(cv::Mat&);
-    void SetImageProcessingAlgorithm(Algorithm);
+    void SetImageProcessingAlgorithm(ObjectsClassifyingAlgorithmName);
 
 public:
     const ImageProcessResult& GetLastImageProcessResult() const;
@@ -29,5 +29,5 @@ public:
 private:
     ImageProcessResult _lastImageProcessingResult;
     ObjectsClassifyingAlgorithm _objectsClassifyingAlgorithm;
-    std::map<Algorithm, ObjectsClassifyingAlgorithm> _objectsClassifyingAlgorithmsMap;
+    std::map<ObjectsClassifyingAlgorithmName, ObjectsClassifyingAlgorithm> _objectsClassifyingAlgorithmsMap;
 };

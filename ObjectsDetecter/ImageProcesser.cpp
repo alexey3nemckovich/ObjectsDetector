@@ -11,9 +11,9 @@ ImageProcesser& ImageProcesser::GetInstance()
 
 ImageProcesser::ImageProcesser()
 {
-    _objectsClassifyingAlgorithmsMap[Algorithm::Alg1] = ObjectsClassifyingAlg1;
-    _objectsClassifyingAlgorithmsMap[Algorithm::Alg2] = ObjectsClassifyingAlg2;
-    _objectsClassifyingAlgorithmsMap[Algorithm::Alg3] = ObjectsClassifyingAlg3;
+    _objectsClassifyingAlgorithmsMap[ObjectsClassifyingAlgorithmName::Alg1] = ObjectsClassifyingAlg1;
+    _objectsClassifyingAlgorithmsMap[ObjectsClassifyingAlgorithmName::Alg2] = ObjectsClassifyingAlg2;
+    _objectsClassifyingAlgorithmsMap[ObjectsClassifyingAlgorithmName::Alg3] = ObjectsClassifyingAlg3;
 }
 
 
@@ -24,7 +24,7 @@ const ImageProcessResult& ImageProcesser::ProcessImage(cv::Mat& image)
 }
 
 
-void ImageProcesser::SetImageProcessingAlgorithm(Algorithm alg)
+void ImageProcesser::SetImageProcessingAlgorithm(ObjectsClassifyingAlgorithmName alg)
 {
     _objectsClassifyingAlgorithm = _objectsClassifyingAlgorithmsMap[alg];
 }

@@ -3,6 +3,7 @@
 #include "cvUtilities.h"
 #include <opencv2/imgcodecs.hpp>
 #include <future>
+#include "SmartPointer.h"
 
 
 class CChildView : public CWnd
@@ -38,7 +39,8 @@ protected:
     afx_msg void OnLoadImageClick();
     afx_msg void OnProcessImageClick();
     afx_msg void OnShowObjectsClick();
-    afx_msg void OnShowTypesClick();
+    afx_msg void OnShowObjectsGroupsClick();
+    afx_msg LRESULT OnNewObjectsClassifyingAlgSelected(WPARAM index, LPARAM);
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -55,10 +57,12 @@ private:
     CButton _buttonProcessImage;
     CButton _buttonShowImageObjects;
     CButton _buttonShowObjectsGroups;
+    SmartPointer<CComboBox> _comboBoxAlg;
 
 private:
     Tab _tab;
     Status _status;
+    int _selectedAlgIndex;
 
 private:
     cv::Mat _sourceImage;

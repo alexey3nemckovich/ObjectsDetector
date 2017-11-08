@@ -84,6 +84,12 @@
     <ClInclude Include="ImageProcesser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SyncComboBox.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlsMessages.h">
+      <Filter>Header Files\FromSync</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ObjectsDetecter.cpp">
@@ -139,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="cvClassifyingAlgsSupport.cpp">
       <Filter>Source Files\cv</Filter>
+    </ClCompile>
+    <ClCompile Include="SyncComboBox.cpp">
+      <Filter>Source Files\FromSync</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

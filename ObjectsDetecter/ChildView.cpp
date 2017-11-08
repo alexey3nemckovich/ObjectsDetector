@@ -1,9 +1,11 @@
 #include "stdafx.h"
+#include "ControlsMessages.h"
 #include "WindowUtilities.h"
 #include <future>
 //
 #include "ObjectsDetecter.h"
 #include "ChildView.h"
+#include "SyncComboBox.h"
 //
 #include <opencv2/imgcodecs.hpp>
 #include "ImageProcesser.h"
@@ -16,6 +18,8 @@
 CChildView::CChildView()
 {
     _tab = Tab::SOURCE_IMAGE;
+
+    _comboBoxAlg = new CSyncComboBox();
 }
 
 
@@ -58,6 +62,8 @@ void CChildView::ChangeStatus(Status status)
             _buttonShowImageObjects.EnableWindow(false);
             _buttonShowObjectsGroups.EnableWindow(false);
             _label.SetWindowText(L"");
+
+            _tab = Tab::SOURCE_IMAGE;
         }
         break;
     case Status::IMAGE_PROCESSING:
@@ -76,6 +82,19 @@ void CChildView::ChangeStatus(Status status)
             _buttonProcessImage.SetWindowText(L"Process");
             _buttonShowImageObjects.EnableWindow(true);
             _buttonShowObjectsGroups.EnableWindow(true);
+
+            if (_tab != Tab::SOURCE_IMAGE)
+            {
+                switch (_tab)
+                {
+                case Tab::IMAGE_OBJECTS:
+                    OnShowObjectsClick();
+                    break;
+                case Tab::IMAGE_OBJECTS_GROUPS:
+                    OnShowObjectsGroupsClick();
+                    break;
+                }
+            }
         }
         break;
     }
@@ -105,6 +124,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
     ON_WM_CREATE()
     ON_WM_SIZE()
     ON_COMMAND_RANGE(0, 65000, OnRangeCmds)
+    ON_MESSAGE(SELECTION_CHANGED_MSG, OnNewObjectsClassifyingAlgSelected)
     ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
@@ -118,6 +138,18 @@ afx_msg int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     wutils::CreateSimpleButton(&_buttonProcessImage, this, L"Process image");
     wutils::CreateSimpleButton(&_buttonShowImageObjects, this, L"Show objects");
     wutils::CreateSimpleButton(&_buttonShowObjectsGroups, this, L"Show objects groups");
+    wutils::CreateSimpleComboBox(_comboBoxAlg, this);
+
+    _comboBoxAlg->AddString(L"Objects classifying algorithm 1");
+    _comboBoxAlg->AddString(L"Objects classifying algorithm 2");
+    _comboBoxAlg->AddString(L"Objects classifying algorithm 3");
+
+    _selectedAlgIndex = 0;
+    _comboBoxAlg->SelectString(0, L"Objects classifying algorithm 1");
+
+    ImageProcesser::GetInstance().SetImageProcessingAlgorithm(
+        ImageProcesser::ObjectsClassifyingAlgorithmName::Alg1
+    );
 
     _label.Create(
         L"",
@@ -157,8 +189,21 @@ afx_msg void CChildView::OnRangeCmds(UINT id)
 
     if (id == _buttonShowObjectsGroups.GetDlgCtrlID())
     {
-        OnShowTypesClick();
+        OnShowObjectsGroupsClick();
     }
+}
+
+
+afx_msg LRESULT CChildView::OnNewObjectsClassifyingAlgSelected(WPARAM index, LPARAM)
+{
+    if (index != _selectedAlgIndex)
+    {
+        auto algName = static_cast<ImageProcesser::ObjectsClassifyingAlgorithmName>(index);
+        ImageProcesser::GetInstance().SetImageProcessingAlgorithm(algName);
+
+        _selectedAlgIndex = index;
+    }
+    return 0;
 }
 
 
@@ -204,10 +249,12 @@ afx_msg void CChildView::OnShowObjectsClick()
     CString res;
     res.Format(L"Total objects count %d", lastProcResult.detectedObjects.size());
     _label.SetWindowText(res);
+
+    _tab = Tab::IMAGE_OBJECTS;
 }
 
 
-afx_msg void CChildView::OnShowTypesClick()
+afx_msg void CChildView::OnShowObjectsGroupsClick()
 {
     const auto& lastProcResult = ImageProcesser::GetInstance().GetLastImageProcessResult();
     SetMatImage(lastProcResult.groupsImage);
@@ -233,6 +280,8 @@ afx_msg void CChildView::OnShowTypesClick()
 
     CString res(str.str().c_str());
     _label.SetWindowText(res);
+
+    _tab = Tab::IMAGE_OBJECTS_GROUPS;
 }
 
 
@@ -246,6 +295,7 @@ afx_msg void CChildView::OnSize(UINT nType, int cx, int cy)
 {
     CWnd::OnSize(nType, cx, cy);
 
+    //Values hardcoded
     _cx = cx;
     _cy = cy;
 
@@ -290,11 +340,21 @@ afx_msg void CChildView::OnSize(UINT nType, int cx, int cy)
 
     _label.MoveWindow(rect);
 
+    rect.top += 5 + _buttonHeigth;
+    rect.bottom = rect.top + 20;
+    rect.left = 0;
+    rect.right = 250;
+
+    _comboBoxAlg->MoveWindow(&rect);
+    wutils::CenterWindowHorizontallyInParent(_comboBoxAlg);
+
     RedrawWindow();
 }
 
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
+    CRect rect(0, 0, _cx, _instrumentsPanelHeight);
+    pDC->Rectangle(&rect);
     return TRUE;
 }
