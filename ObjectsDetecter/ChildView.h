@@ -40,7 +40,7 @@ protected:
     afx_msg void OnProcessImageClick();
     afx_msg void OnShowObjectsClick();
     afx_msg void OnShowObjectsGroupsClick();
-    afx_msg LRESULT OnNewObjectsClassifyingAlgSelected(WPARAM index, LPARAM);
+    afx_msg LRESULT OnNewObjectsClassifierSelected(WPARAM index, LPARAM);
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -57,12 +57,12 @@ private:
     CButton _buttonProcessImage;
     CButton _buttonShowImageObjects;
     CButton _buttonShowObjectsGroups;
-    SmartPointer<CComboBox> _comboBoxAlg;
+    SmartPointer<CComboBox> _comboBoxClassifier;
 
 private:
     Tab _tab;
     Status _status;
-    int _selectedAlgIndex;
+    int _selectedClassifierIndex;
 
 private:
     cv::Mat _sourceImage;

@@ -90,6 +90,15 @@
     <ClInclude Include="ControlsMessages.h">
       <Filter>Header Files\FromSync</Filter>
     </ClInclude>
+    <ClInclude Include="MatchAllGroupClassifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MostMatchingValueClassifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CriterionClassifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ObjectsDetecter.cpp">
@@ -148,6 +157,21 @@
     </ClCompile>
     <ClCompile Include="SyncComboBox.cpp">
       <Filter>Source Files\FromSync</Filter>
+    </ClCompile>
+    <ClCompile Include="MatchAllGroupClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectsClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MostMatchingValueClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CriterionClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectsClassifierFactory.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

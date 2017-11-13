@@ -189,10 +189,13 @@
     <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="CommonUtilities.h" />
     <ClInclude Include="ControlsMessages.h" />
+    <ClInclude Include="CriterionClassifier.h" />
     <ClInclude Include="cvUtilities.h" />
     <ClInclude Include="IDGenerator.h" />
     <ClInclude Include="ImageProcesser.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MatchAllGroupClassifier.h" />
+    <ClInclude Include="MostMatchingValueClassifier.h" />
     <ClInclude Include="ObjectsDetecter.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SmartPointer.h" />
@@ -208,6 +211,7 @@
   <ItemGroup>
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="CommonUtilities.cpp" />
+    <ClCompile Include="CriterionClassifier.cpp" />
     <ClCompile Include="cvClassifyingAlg1.cpp" />
     <ClCompile Include="cvClassifyingAlg2.cpp" />
     <ClCompile Include="cvClassifyingAlg3.cpp" />
@@ -218,6 +222,10 @@
     <ClCompile Include="IDGenerator.cpp" />
     <ClCompile Include="ImageProcesser.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MatchAllGroupClassifier.cpp" />
+    <ClCompile Include="MostMatchingValueClassifier.cpp" />
+    <ClCompile Include="ObjectsClassifier.cpp" />
+    <ClCompile Include="ObjectsClassifierFactory.cpp" />
     <ClCompile Include="ObjectsDetecter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

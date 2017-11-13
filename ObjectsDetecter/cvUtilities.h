@@ -76,4 +76,6 @@ namespace cvutils
 
     ImageProcessResult ProcessImage(cv::Mat& img, ObjectsClassifyingAlgorithm classifyingAlgorithm);
 
+    ObjectsList SegmentObjects(const Mat& sourceImage);
+
 }

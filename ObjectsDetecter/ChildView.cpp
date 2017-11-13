@@ -19,7 +19,7 @@ CChildView::CChildView()
 {
     _tab = Tab::SOURCE_IMAGE;
 
-    _comboBoxAlg = new CSyncComboBox();
+    _comboBoxClassifier = new CSyncComboBox();
 }
 
 
@@ -124,7 +124,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
     ON_WM_CREATE()
     ON_WM_SIZE()
     ON_COMMAND_RANGE(0, 65000, OnRangeCmds)
-    ON_MESSAGE(SELECTION_CHANGED_MSG, OnNewObjectsClassifyingAlgSelected)
+    ON_MESSAGE(SELECTION_CHANGED_MSG, OnNewObjectsClassifierSelected)
     ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
@@ -138,17 +138,20 @@ afx_msg int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     wutils::CreateSimpleButton(&_buttonProcessImage, this, L"Process image");
     wutils::CreateSimpleButton(&_buttonShowImageObjects, this, L"Show objects");
     wutils::CreateSimpleButton(&_buttonShowObjectsGroups, this, L"Show objects groups");
-    wutils::CreateSimpleComboBox(_comboBoxAlg, this);
+    wutils::CreateSimpleComboBox(_comboBoxClassifier, this);
 
-    _comboBoxAlg->AddString(L"Objects classifying algorithm 1");
-    _comboBoxAlg->AddString(L"Objects classifying algorithm 2");
-    _comboBoxAlg->AddString(L"Objects classifying algorithm 3");
+    auto listClassifiersNames = ImageProcesser::GetInstance().GetListClassifiersNames();
+    for (auto& str : listClassifiersNames)
+    {
+        _comboBoxClassifier->AddString(CString(str.c_str()));
+    }
 
-    _selectedAlgIndex = 0;
-    _comboBoxAlg->SelectString(0, L"Objects classifying algorithm 1");
+    CString firstClassifierName(std::move(CString(listClassifiersNames[0].c_str())));
+    _selectedClassifierIndex = 0;
+    _comboBoxClassifier->SelectString(0, firstClassifierName);
 
-    ImageProcesser::GetInstance().SetImageProcessingAlgorithm(
-        ImageProcesser::ObjectsClassifyingAlgorithmName::Alg1
+    ImageProcesser::GetInstance().SetObjectsClassifierByName(
+        listClassifiersNames[0]
     );
 
     _label.Create(
@@ -194,14 +197,28 @@ afx_msg void CChildView::OnRangeCmds(UINT id)
 }
 
 
-afx_msg LRESULT CChildView::OnNewObjectsClassifyingAlgSelected(WPARAM index, LPARAM)
+char* CStringToCStr(const CString& str)
 {
-    if (index != _selectedAlgIndex)
-    {
-        auto algName = static_cast<ImageProcesser::ObjectsClassifyingAlgorithmName>(index);
-        ImageProcesser::GetInstance().SetImageProcessingAlgorithm(algName);
+    char* pPath = new char[str.GetLength() + 1];
+    pPath[str.GetLength()] = 0;
+    std::wcstombs(pPath, const_cast<CString&>(str).GetBuffer(), str.GetLength());
 
-        _selectedAlgIndex = index;
+    return pPath;
+}
+
+
+afx_msg LRESULT CChildView::OnNewObjectsClassifierSelected(WPARAM index, LPARAM)
+{
+    if (index != _selectedClassifierIndex)
+    {
+        CString text;
+        _comboBoxClassifier->GetLBText(_comboBoxClassifier->GetCurSel(), text);
+        char* cText = CStringToCStr(text);
+
+        ImageProcesser::GetInstance().SetObjectsClassifierByName(std::string(cText));
+
+        delete cText;
+        _selectedClassifierIndex = index;
     }
     return 0;
 }
@@ -215,15 +232,12 @@ afx_msg void CChildView::OnLoadImageClick()
     if (IDOK == res)
     {
         CString imagePath = dialog.GetPathName();
+        char* cStr = CStringToCStr(imagePath);
 
-        char* pPath = new char[imagePath.GetLength() + 1];
-        pPath[imagePath.GetLength()] = 0;
-        std::wcstombs(pPath, imagePath.GetBuffer(), imagePath.GetLength());
-
-        _sourceImage = cv::imread(cv::String(pPath));
+        _sourceImage = cv::imread(cv::String(cStr));
         SetMatImage(_sourceImage);
-        delete pPath;
 
+        delete cStr;
         ChangeStatus(Status::IMAGE_LOADED);
     }
 }
@@ -345,8 +359,8 @@ afx_msg void CChildView::OnSize(UINT nType, int cx, int cy)
     rect.left = 0;
     rect.right = 250;
 
-    _comboBoxAlg->MoveWindow(&rect);
-    wutils::CenterWindowHorizontallyInParent(_comboBoxAlg);
+    _comboBoxClassifier->MoveWindow(&rect);
+    wutils::CenterWindowHorizontallyInParent(_comboBoxClassifier);
 
     RedrawWindow();
 }
