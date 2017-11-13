@@ -73,6 +73,7 @@ void CChildView::ChangeStatus(Status status)
             _buttonProcessImage.SetWindowText(L"Processing");
             _buttonShowImageObjects.EnableWindow(false);
             _buttonShowObjectsGroups.EnableWindow(false);
+            _comboBoxClassifier->EnableWindow(false);
         }
         break;
     case Status::IMAGE_PROCESSED:
@@ -82,6 +83,7 @@ void CChildView::ChangeStatus(Status status)
             _buttonProcessImage.SetWindowText(L"Process");
             _buttonShowImageObjects.EnableWindow(true);
             _buttonShowObjectsGroups.EnableWindow(true);
+            _comboBoxClassifier->EnableWindow(true);
 
             if (_tab != Tab::SOURCE_IMAGE)
             {

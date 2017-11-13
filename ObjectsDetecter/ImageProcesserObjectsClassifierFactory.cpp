@@ -14,7 +14,7 @@ ImageProcesser::ObjectsClassifierFactory& ImageProcesser::ObjectsClassifierFacto
 
 ImageProcesser::ObjectsClassifierFactory::ObjectsClassifierFactory()
 {
-    auto createAndAddClassifierToMap = [this](ImageProcesser::ObjectsClassifier* classifier) {
+    auto createAndAddClassifierToMap = [this] (ImageProcesser::ObjectsClassifier* classifier) -> void {
         _classifiersMap[classifier->GetName()] = ImageProcesser::ObjectsClassifier::Ptr(classifier);
     };
 

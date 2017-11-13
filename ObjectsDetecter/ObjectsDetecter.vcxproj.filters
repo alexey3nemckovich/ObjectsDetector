@@ -25,6 +25,18 @@
     <Filter Include="Source Files\cv">
       <UniqueIdentifier>{375b9cd5-61a2-4b22-bc1a-519ec77c073c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\image_processing">
+      <UniqueIdentifier>{98cc157f-0930-4ca7-a11d-3770ef812857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\image_processing">
+      <UniqueIdentifier>{e71eda69-267f-44e6-83c9-6054150512ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\image_processing\classifiers">
+      <UniqueIdentifier>{c0887707-d946-402f-8626-5e1f1a6432fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\image_processing\classifiers">
+      <UniqueIdentifier>{8ab2ee7c-c240-4bab-8267-454aafc3b842}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -81,23 +93,23 @@
     <ClInclude Include="cvUtilities.h">
       <Filter>Header Files\cv</Filter>
     </ClInclude>
-    <ClInclude Include="ImageProcesser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SyncComboBox.h">
       <Filter>Header Files\FromSync</Filter>
     </ClInclude>
     <ClInclude Include="ControlsMessages.h">
       <Filter>Header Files\FromSync</Filter>
     </ClInclude>
-    <ClInclude Include="MatchAllGroupClassifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MostMatchingValueClassifier.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ImageProcesser.h">
+      <Filter>Header Files\image_processing</Filter>
     </ClInclude>
     <ClInclude Include="CriterionClassifier.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\image_processing\classifiers</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchAllGroupClassifier.h">
+      <Filter>Header Files\image_processing\classifiers</Filter>
+    </ClInclude>
+    <ClInclude Include="MostMatchingValueClassifier.h">
+      <Filter>Header Files\image_processing\classifiers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -134,44 +146,32 @@
     <ClCompile Include="cvUtilities.cpp">
       <Filter>Source Files\cv</Filter>
     </ClCompile>
-    <ClCompile Include="ImageProcesser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cvClassifyingAlg1.cpp">
-      <Filter>Source Files\cv</Filter>
-    </ClCompile>
-    <ClCompile Include="cvClassifyingAlg2.cpp">
-      <Filter>Source Files\cv</Filter>
-    </ClCompile>
-    <ClCompile Include="cvClassifyingAlg3.cpp">
-      <Filter>Source Files\cv</Filter>
-    </ClCompile>
     <ClCompile Include="cvImageProcessingUtils.cpp">
       <Filter>Source Files\cv</Filter>
     </ClCompile>
     <ClCompile Include="cvObjectInfo.cpp">
       <Filter>Source Files\cv</Filter>
     </ClCompile>
-    <ClCompile Include="cvClassifyingAlgsSupport.cpp">
-      <Filter>Source Files\cv</Filter>
-    </ClCompile>
     <ClCompile Include="SyncComboBox.cpp">
       <Filter>Source Files\FromSync</Filter>
     </ClCompile>
-    <ClCompile Include="MatchAllGroupClassifier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectsClassifier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MostMatchingValueClassifier.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ImageProcesser.cpp">
+      <Filter>Source Files\image_processing</Filter>
     </ClCompile>
     <ClCompile Include="CriterionClassifier.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\image_processing\classifiers</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectsClassifierFactory.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MatchAllGroupClassifier.cpp">
+      <Filter>Source Files\image_processing\classifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="MostMatchingValueClassifier.cpp">
+      <Filter>Source Files\image_processing\classifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcesserObjectsClassifier.cpp">
+      <Filter>Source Files\image_processing</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcesserObjectsClassifierFactory.cpp">
+      <Filter>Source Files\image_processing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -27,7 +27,7 @@ private:
 
 private:
     ImageProcessResult _lastImageProcessingResult;
-    std::shared_ptr<ObjectsClassifier> _objectsClassifier;
+    shared_ptr<ObjectsClassifier> _objectsClassifier;
 };
 
 

@@ -51,8 +51,7 @@ const ImageProcessResult& ImageProcesser::ProcessImage(cv::Mat& image)
 
 void ImageProcesser::SetObjectsClassifierByName(const string& name)
 {
-    _objectsClassifier = 
-        ImageProcesser::ObjectsClassifierFactory::GetInstance().GetClassifierByName(name);
+    _objectsClassifier = ImageProcesser::ObjectsClassifierFactory::GetInstance().GetClassifierByName(name);
 }
 
 

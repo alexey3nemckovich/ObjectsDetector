@@ -212,10 +212,6 @@
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="CommonUtilities.cpp" />
     <ClCompile Include="CriterionClassifier.cpp" />
-    <ClCompile Include="cvClassifyingAlg1.cpp" />
-    <ClCompile Include="cvClassifyingAlg2.cpp" />
-    <ClCompile Include="cvClassifyingAlg3.cpp" />
-    <ClCompile Include="cvClassifyingAlgsSupport.cpp" />
     <ClCompile Include="cvImageProcessingUtils.cpp" />
     <ClCompile Include="cvObjectInfo.cpp" />
     <ClCompile Include="cvUtilities.cpp" />
@@ -224,8 +220,8 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MatchAllGroupClassifier.cpp" />
     <ClCompile Include="MostMatchingValueClassifier.cpp" />
-    <ClCompile Include="ObjectsClassifier.cpp" />
-    <ClCompile Include="ObjectsClassifierFactory.cpp" />
+    <ClCompile Include="ImageProcesserObjectsClassifier.cpp" />
+    <ClCompile Include="ImageProcesserObjectsClassifierFactory.cpp" />
     <ClCompile Include="ObjectsDetecter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
